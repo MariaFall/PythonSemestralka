@@ -59,20 +59,14 @@ def resize_image(image: Image.Image, resize_percent: int) -> Image.Image:
 
 
 def apply_edge_detection(image: Image.Image, method: str) -> Image.Image:
-    """
-    Edge detection using NumPy-based convolution.
-    - 'sobel': Sobel filter
-    - 'laplacian': Laplacian filter
-    """
-    img_array = np.array(image.convert("L"), dtype=np.float32)  # Convert to grayscale
-
-    # Define Sobel and Laplacian kernels
+    img_array = np.array(image.convert("L"), dtype=np.float32)
     sobel_x = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], dtype=np.float32)
     sobel_y = np.array([[-1, -2, -1], [0, 0, 0], [1, 2, 1]], dtype=np.float32)
     laplacian_kernel = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]], dtype=np.float32)
+    prewitt_x = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]], dtype=np.float32)
+    prewitt_y = np.array([[-1, -1, -1], [0, 0, 0], [1, 1, 1]], dtype=np.float32)
 
     def convolve(image, kernel):
-        """Efficient 2D convolution using NumPy."""
         kernel_size = kernel.shape[0]
         pad_size = kernel_size // 2
         padded = np.pad(image, pad_size, mode='reflect')
@@ -87,11 +81,15 @@ def apply_edge_detection(image: Image.Image, method: str) -> Image.Image:
         edges = np.hypot(edges_x, edges_y)
     elif method == "laplacian":
         edges = convolve(img_array, laplacian_kernel)
+    elif method == "prewitt":
+        edges_x = convolve(img_array, prewitt_x)
+        edges_y = convolve(img_array, prewitt_y)
+        edges = np.hypot(edges_x, edges_y)
     else:
-        return image  # Return original if no valid method is chosen
+        return image
 
     edges = np.clip(edges / edges.max() * 255, 0, 255).astype(np.uint8)
-    return Image.fromarray(edges, mode="L")  # Return grayscale image with detected edges
+    return Image.fromarray(edges, mode="L")
 
 
 def process_image(image_file, brightness, solarization, negative_type, resize_percent, edge_detection):
