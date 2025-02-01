@@ -4,16 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Úprava obrázků</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 20px auto;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .image-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+    </style>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const form = document.getElementById("image-form");
-            const imageInput = document.getElementById("image-upload");
-            const brightnessInput = document.getElementById("brightness");
-            const solarizationInput = document.getElementById("solarization");
-            const negativeInput = document.getElementById("negative");
-            const negativeTypeInput = document.getElementById("negative-type");
-            const resizeInput = document.getElementById("resize");
-            const edgeDetectionInput = document.getElementById("edge-detection");
             const resultImage = document.getElementById("processed-image");
 
             form.addEventListener("submit", function(event) {
@@ -48,17 +100,15 @@
         <label for="solarization">Solarizace:</label>
         <input type="checkbox" id="solarization" name="solarization" value="1">
 
-        <label for="negative">Negativ:</label>
-        <input type="checkbox" id="negative" name="negative" value="1">
-
         <label for="negative-type">Typ negativu:</label>
         <select id="negative-type" name="negative-type">
+            <option value="none">Žádný</option>
             <option value="color">Barevný</option>
             <option value="bw">Černobílý</option>
         </select>
 
         <label for="resize">Zmenšení (%):</label>
-        <input type="number" id="resize" name="resize" min="1" max="100" value="100">
+        <input type="range" id="resize" name="resize" min="1" max="100" value="100">
 
         <label for="edge-detection">Zvýraznění hran:</label>
         <select id="edge-detection" name="edge-detection">
@@ -70,7 +120,9 @@
         <button type="submit">Odeslat</button>
     </form>
 
-    <h2>Výsledek</h2>
-    <img id="processed-image" src="#" alt="Výsledek" style="display:none;">
+    <div class="image-container">
+        <h2>Výsledek</h2>
+        <img id="processed-image" src="#" alt="Výsledek">
+    </div>
 </body>
 </html>
