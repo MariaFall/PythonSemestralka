@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Úprava obrázků</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.getElementById("image-form");
+            const imageInput = document.getElementById("image-upload");
+            const brightnessInput = document.getElementById("brightness");
+            const solarizationInput = document.getElementById("solarization");
+            const negativeInput = document.getElementById("negative");
+            const negativeTypeInput = document.getElementById("negative-type");
+            const resultImage = document.getElementById("processed-image");
+
+            form.addEventListener("submit", function(event) {
+                event.preventDefault();
+                const formData = new FormData(form);
+
+                fetch("/upload", {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => response.blob())
+                .then(blob => {
+                    const objectURL = URL.createObjectURL(blob);
+                    resultImage.src = objectURL;
+                    resultImage.style.display = "block";
+                })
+                .catch(error => console.error("Error:", error));
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Editor obrázků</h1>
+    <form id="image-form" enctype="multipart/form-data" method="POST" action="/upload">
+        <label for="image-upload">Nahrát obrázek:</label>
+        <input type="file" id="image-upload" name="image" accept="image/*" required>
+
+        <h2>Úprava efektů</h2>
+        <label for="brightness">Jas:</label>
+        <input type="range" id="brightness" name="brightness" min="-100" max="100" value="0">
+
+        <label for="solarization">Solarizace:</label>
+        <input type="checkbox" id="solarization" name="solarization" value="1">
+
+        <label for="negative">Negativ:</label>
+        <input type="checkbox" id="negative" name="negative" value="1">
+
+        <label for="negative-type">Typ negativu:</label>
+        <select id="negative-type" name="negative-type">
+            <option value="color">Barevný</option>
+            <option value="bw">Černobílý</option>
+        </select>
+
+        <button type="submit">Odeslat</button>
+    </form>
+
+    <h2>Výsledek</h2>
+    <img id="processed-image" src="#" alt="Výsledek" style="display:none;">
+</body>
+</html>
