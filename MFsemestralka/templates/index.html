@@ -12,6 +12,7 @@
             const solarizationInput = document.getElementById("solarization");
             const negativeInput = document.getElementById("negative");
             const negativeTypeInput = document.getElementById("negative-type");
+            const resizeInput = document.getElementById("resize");
             const resultImage = document.getElementById("processed-image");
 
             form.addEventListener("submit", function(event) {
@@ -54,6 +55,9 @@
             <option value="color">Barevný</option>
             <option value="bw">Černobílý</option>
         </select>
+
+        <label for="resize">Zmenšení (%):</label>
+        <input type="number" id="resize" name="resize" min="1" max="100" value="100">
 
         <button type="submit">Odeslat</button>
     </form>

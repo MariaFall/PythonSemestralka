@@ -35,21 +35,34 @@ def apply_negative(image: Image.Image, negative_type: str) -> Image.Image:
     img_array = np.array(image)
 
     if negative_type == "bw":
-        # Convert to grayscale and invert
         grayscale = np.dot(img_array[..., :3], [0.299, 0.587, 0.114]).astype(np.uint8)
         negative_array = 255 - grayscale
         return Image.fromarray(negative_array, mode="L")  # "L" mode = grayscale
 
-    # Color negative (invert all RGB channels)
     negative_array = 255 - img_array
     return Image.fromarray(negative_array.astype(np.uint8))
 
 
-def process_image(image_file, brightness, solarization, negative, negative_type):
+def resize_image(image: Image.Image, resize_percent: int) -> Image.Image:
     """
-    Process the image by applying brightness, solarization, and negative effects.
+    Resize the image by a given percentage (1-100% of the original size).
+    """
+    if resize_percent < 1 or resize_percent > 100:
+        return image  # Ignore invalid resize values
+
+    width, height = image.size
+    new_size = (int(width * resize_percent / 100), int(height * resize_percent / 100))
+    return image.resize(new_size, Image.Resampling.LANCZOS)  # Fixed: Using Image.Resampling.LANCZOS
+
+
+def process_image(image_file, brightness, solarization, negative, negative_type, resize_percent):
+    """
+    Process the image by applying brightness, solarization, negative effects, and resizing.
     """
     image = Image.open(image_file).convert('RGB')
+
+    if resize_percent != 100:  # Only resize if it's not 100%
+        image = resize_image(image, resize_percent)
 
     if brightness != 0:
         image = adjust_brightness(image, brightness)
@@ -78,11 +91,12 @@ def upload():
     solarization = 'solarization' in request.form
     negative = 'negative' in request.form
     negative_type = request.form.get('negative-type', 'color')  # Default to color negative
+    resize_percent = int(request.form.get('resize', 100))  # Default to 100% (no resizing)
 
     if image_file.filename == '':
         return "No selected file", 400
 
-    processed_image = process_image(image_file, brightness, solarization, negative, negative_type)
+    processed_image = process_image(image_file, brightness, solarization, negative, negative_type, resize_percent)
 
     img_io = io.BytesIO()
     processed_image.save(img_io, format="PNG")
