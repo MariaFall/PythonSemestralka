@@ -13,6 +13,7 @@
             const negativeInput = document.getElementById("negative");
             const negativeTypeInput = document.getElementById("negative-type");
             const resizeInput = document.getElementById("resize");
+            const edgeDetectionInput = document.getElementById("edge-detection");
             const resultImage = document.getElementById("processed-image");
 
             form.addEventListener("submit", function(event) {
@@ -58,6 +59,13 @@
 
         <label for="resize">Zmenšení (%):</label>
         <input type="number" id="resize" name="resize" min="1" max="100" value="100">
+
+        <label for="edge-detection">Zvýraznění hran:</label>
+        <select id="edge-detection" name="edge-detection">
+            <option value="none">Žádné</option>
+            <option value="sobel">Sobel</option>
+            <option value="laplacian">Laplacian</option>
+        </select>
 
         <button type="submit">Odeslat</button>
     </form>
