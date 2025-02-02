@@ -19,7 +19,7 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
+            width: 400px;
             margin: 20px auto;
             overflow: hidden;
         }
@@ -45,6 +45,12 @@
         button:hover {
             background-color: #218838;
         }
+        .reset-button {
+            background-color: #dc3545;
+        }
+        .reset-button:hover {
+            background-color: #c82333;
+        }
         .image-container {
             width: min-content;
             min-width: 400px;
@@ -58,7 +64,6 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin: 20px auto;
-            overflow: hidden;
         }
         img {
             border-radius: 8px;
@@ -70,7 +75,22 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const form = document.getElementById("image-form");
-            const resultImage = document.getElementById("processed-image");
+            const processedImage = document.getElementById("processed-image");
+            const originalImage = document.getElementById("original-image");
+            const resetButton = document.getElementById("reset-button");
+            const fileInput = document.getElementById("image-upload");
+
+            let originalImageURL = null;
+
+            fileInput.addEventListener("change", function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    originalImageURL = URL.createObjectURL(file);
+                    originalImage.src = originalImageURL;
+                    originalImage.style.display = "block";
+                    processedImage.style.display = "none";
+                }
+            });
 
             form.addEventListener("submit", function(event) {
                 event.preventDefault();
@@ -83,10 +103,32 @@
                 .then(response => response.blob())
                 .then(blob => {
                     const objectURL = URL.createObjectURL(blob);
-                    resultImage.src = objectURL;
-                    resultImage.style.display = "block";
+                    processedImage.src = objectURL;
+                    processedImage.style.display = "block";
+                    originalImage.style.display = "none";
                 })
                 .catch(error => console.error("Error:", error));
+            });
+
+            resetButton.addEventListener("click", function() {
+                // Reset effect controls, but keep the uploaded file
+                form.querySelectorAll("input[type='range'], select").forEach(input => {
+                    if (input.type === "range") {
+                        input.value = input.defaultValue;
+                    } else {
+                        input.selectedIndex = 0;
+                    }
+                });
+
+                // Uncheck the checkbox manually
+                document.getElementById("solarization").checked = false;
+
+                // Show the original image again
+                if (originalImageURL) {
+                    originalImage.src = originalImageURL;
+                    originalImage.style.display = "block";
+                    processedImage.style.display = "none";
+                }
             });
         });
     </script>
@@ -103,6 +145,16 @@
 
         <label for="solarization">Solarizace:</label>
         <input type="checkbox" id="solarization" name="solarization" value="1">
+
+        <label for="transposition">Transpozice:</label>
+        <select id="transposition" name="transposition">
+            <option value="none">Žádná</option>
+            <option value="flip_lr">Zrcadlové vodorovné</option>
+            <option value="flip_tb">Zrcadlové svislé</option>
+            <option value="rotate_90">Rotace 90°</option>
+            <option value="rotate_180">Rotace 180°</option>
+            <option value="rotate_270">Rotace 270°</option>
+        </select>
 
         <label for="negative-type">Typ negativu:</label>
         <select id="negative-type" name="negative-type">
@@ -123,11 +175,13 @@
         </select>
 
         <button type="submit">Odeslat</button>
+        <button type="button" id="reset-button" class="reset-button">Reset</button>
     </form>
 
     <div class="image-container">
         <h2>Výsledek</h2>
-        <img id="processed-image" src="#" alt="Výsledek">
+        <img id="original-image" src="#" alt="Původní obrázek">
+        <img id="processed-image" src="#" alt="Upravený obrázek">
     </div>
 </body>
 </html>

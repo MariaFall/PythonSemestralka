@@ -59,6 +59,27 @@ def resize_image(image: Image.Image, resize_percent: int) -> Image.Image:
     new_size = (int(width * resize_percent / 100), int(height * resize_percent / 100))
     return image.resize(new_size, Image.Resampling.LANCZOS)
 
+def apply_transposition(image: Image.Image, transposition: str) -> Image.Image:
+    """
+    Apply a transposition effect to the image.
+    Supported operations:
+      - 'flip_lr': Flip left-right (mirror horizontally)
+      - 'flip_tb': Flip top-bottom (mirror vertically)
+      - 'rotate_90': Rotate 90 degrees counterclockwise
+      - 'rotate_180': Rotate 180 degrees
+      - 'rotate_270': Rotate 270 degrees counterclockwise
+    """
+    if transposition == "flip_lr":
+        return image.transpose(Image.FLIP_LEFT_RIGHT)
+    elif transposition == "flip_tb":
+        return image.transpose(Image.FLIP_TOP_BOTTOM)
+    elif transposition == "rotate_90":
+        return image.transpose(Image.ROTATE_90)
+    elif transposition == "rotate_180":
+        return image.transpose(Image.ROTATE_180)
+    elif transposition == "rotate_270":
+        return image.transpose(Image.ROTATE_270)
+    return image
 
 def apply_edge_detection(image: Image.Image, method: str) -> Image.Image:
     img_array = np.array(image.convert("L"), dtype=np.float32)
@@ -94,7 +115,7 @@ def apply_edge_detection(image: Image.Image, method: str) -> Image.Image:
     return Image.fromarray(edges, mode="L")
 
 
-def process_image(image_file, brightness, solarization, negative_type, resize_percent, edge_detection):
+def process_image(image_file, brightness, solarization, negative_type, resize_percent, edge_detection, transposition):
     """
     Process the image by applying brightness, solarization, negative effects, resizing, and edge detection.
     """
@@ -115,6 +136,9 @@ def process_image(image_file, brightness, solarization, negative_type, resize_pe
     if edge_detection and edge_detection != "none":
         image = apply_edge_detection(image, edge_detection)
 
+    if transposition != "none":
+        image = apply_transposition(image, transposition)
+
     return image
 
 
@@ -134,11 +158,12 @@ def upload():
     negative_type = request.form.get('negative-type', 'none')  # Default to no negative
     resize_percent = int(request.form.get('resize', 100))  # Default to 100% (no resizing)
     edge_detection = request.form.get('edge-detection', 'none')
+    transposition = request.form.get('transposition', 'none')
 
     if image_file.filename == '':
         return "No selected file", 400
 
-    processed_image = process_image(image_file, brightness, solarization, negative_type, resize_percent, edge_detection)
+    processed_image = process_image(image_file, brightness, solarization, negative_type, resize_percent, edge_detection, transposition)
 
     img_io = io.BytesIO()
     processed_image.save(img_io, format="PNG")
