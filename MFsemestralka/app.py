@@ -48,10 +48,12 @@ def apply_negative(image: Image.Image, negative_type: str) -> Image.Image:
 
 def resize_image(image: Image.Image, resize_percent: int) -> Image.Image:
     """
-    Resize the image by a given percentage (0-100% of the original size).
+    Resize the image by a given percentage of the original size.
+    100% is the original size. Values below 100% reduce the size,
+    and values above 100% enlarge the image.
     """
-    if resize_percent < 1 or resize_percent > 100:
-        return image  # Ignore invalid resize values
+    if resize_percent < 1:
+        return image  # Ignore invalid values
 
     width, height = image.size
     new_size = (int(width * resize_percent / 100), int(height * resize_percent / 100))
