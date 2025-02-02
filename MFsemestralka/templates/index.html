@@ -54,7 +54,6 @@
         .image-container {
             width: min-content;
             min-width: 400px;
-            margin-top: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -110,8 +109,8 @@
                 .catch(error => console.error("Error:", error));
             });
 
+            //reset button keeps the selected image and resets properties back to default
             resetButton.addEventListener("click", function() {
-                // Reset effect controls, but keep the uploaded file
                 form.querySelectorAll("input[type='range'], select").forEach(input => {
                     if (input.type === "range") {
                         input.value = input.defaultValue;
@@ -120,10 +119,9 @@
                     }
                 });
 
-                // Uncheck the checkbox manually
                 document.getElementById("solarization").checked = false;
 
-                // Show the original image again
+                //displays default image
                 if (originalImageURL) {
                     originalImage.src = originalImageURL;
                     originalImage.style.display = "block";
